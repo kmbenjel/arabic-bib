@@ -48,7 +48,7 @@ EPILOG = """examples:
 class _C:
     """ANSI colours, only on a terminal and only without NO_COLOR."""
 
-    on = sys.stdout.isatty() and not os.environ.get("NO_COLOR")
+    on = (sys.stdout.isatty() or bool(os.environ.get("FORCE_COLOR"))) and not os.environ.get("NO_COLOR")
 
     @classmethod
     def w(cls, code: str, s: str) -> str:
