@@ -269,4 +269,4 @@ The most useful report is the exact string that fails: each one becomes a row in
 If you use arabic-bib in research, please cite it ([CITATION.cff](CITATION.cff)). Code: MIT. The recordings embed
 Kawkab Mono (SIL OFL 1.1, [`docs/media/fonts/OFL.txt`](docs/media/fonts/OFL.txt)).
 
-Part of **[Warraq](https://warraq.benjelloun.dev)** (الورّاق), open tools for Arabic libraries.
+Part of **[Warraq](https://warraq.benjelloun.dev)** (الورّاق), open tools for digital heritage libraries.
