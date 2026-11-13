@@ -39,6 +39,7 @@ __all__ = [
     "parse_author",
     "same_author",
     "same_person",
+    "publisher_family",
     "same_publisher",
 ]
 
@@ -346,6 +347,7 @@ def _clean(raw: str) -> tuple[str, str, Death | None]:
         return f" {x} " if len(x.split()) <= 2 else " "  # «ابن رشد (الجد)» → inline
 
     s = _PAREN.sub(paren, s)
+    s = re.sub(r"[\"“”„«»]+", " ", s).strip()
     parts = [p.strip() for p in _ALT_SEP.split(s) if p.strip()]
     if len(parts) >= 2:
         # Shamela's «short؛ full» form: the short one is the shuhra, the full one is parsed
@@ -355,12 +357,13 @@ def _clean(raw: str) -> tuple[str, str, Death | None]:
         shuhra = shuhra or short
         s = full
     elif "،" in s or "," in s:
-        # a catalogue's inverted form «الذهبي، محمد بن أحمد» / «Surname, Given»: a one- or two-word head is the
-        # name he is known by, the rest the name in order
-        head, _, tail = re.split(r"\s*[،,]\s*", s, maxsplit=1)[0], None, re.split(r"\s*[،,]\s*", s, maxsplit=1)[1]
-        if len(head.split()) <= 2 and tail and len(tail.split()) >= 2:
+        # a library catalogue's inverted form «الذهبي، محمد بن أحمد», «ابن خلدون، عبد الرحمن بن محمد»,
+        # «"إبن المقفع، عبد الله"», «كاترمير، ا. م.»: the head is the name he is known by; the name is written back
+        # in its natural order, the head after the given names
+        head, tail = (x.strip() for x in re.split(r"\s*[،,]\s*", s, maxsplit=1))
+        if 1 <= len(head.split()) <= 3 and tail and len(tail.split()) <= 5 and not re.search(r"[0-9٠-٩]", tail):
             shuhra = shuhra or head
-            s = tail + (" " + head if _is_nisba(K(head)) else "")
+            s = f"{tail} {head}"
         else:
             s = re.sub(r"\s*[،,]\s*", " ", s)
     s = re.sub(r"[\"«»:.\-–]+", " ", s)
@@ -619,11 +622,12 @@ def match_authors(a: str | AuthorName, b: str | AuthorName, *, common: Iterable[
         reasons.append("nasab-triple")
 
     # each form has a name the other lacks: «فخر الدين الرازي» / «ابن أبي حاتم الرازي»
-    s_lq = [x for x in S.laqab if x not in L.laqab]
-    l_ibn = [v for v in L.a.units if v.kind == "ibn" and not _ibn_supported(K(v.text)[4:], S)]
-    s_ibn = [v for v in S.a.units if v.kind == "ibn"]
-    if s_lq and l_ibn and not s_ibn and not conflicts:
-        conflicts.append(f"name-conflict:{s_lq[0]}!={l_ibn[0].text}")
+    for X, Y in ((S, L), (L, S)):
+        x_lq = [x for x in X.laqab if x not in Y.laqab]
+        y_ibn = [v for v in Y.a.units if v.kind == "ibn" and not _ibn_supported(K(v.text)[4:], X)]
+        x_ibn = [v for v in X.a.units if v.kind == "ibn"]
+        if x_lq and y_ibn and not x_ibn and not conflicts:
+            conflicts.append(f"name-conflict:{x_lq[0]}!={y_ibn[0].text}")
     if conflicts:
         return AuthorMatch("different", round(0.2 * support / max(checked, 1), 3), tuple(conflicts + reasons))
     coverage = support / max(checked, 1)
@@ -697,13 +701,42 @@ def same_person(a: str, b: str) -> bool:
     return len(short & long_) >= min(2, len(short))
 
 
-def same_publisher(a: str, b: str) -> bool:
+#: Printing houses known under several names (public history of Arabic printing). A name belongs to a family when
+#: all the words of one of its patterns are in it. Extend with ``same_publisher(..., families=…)``.
+PUBLISHER_FAMILIES: dict[str, tuple[str, ...]] = {
+    "bulaq": ("بولاق", "المطبعة الأميرية", "المطبعة الكبرى الأميرية", "المطبعة الكبرى ببولاق"),
+    "babi-halabi-mustafa": ("مصطفى البابي الحلبي", "مكتبة الحلبي", "مطبعة الحلبي", "مصطفى الحلبي"),
+    "babi-halabi-isa": ("عيسى البابي الحلبي", "دار إحياء الكتب العربية"),
+    "dairat-al-maarif": ("دائرة المعارف العثمانية", "دائرة المعارف النظامية", "مجلس دائرة المعارف"),
+    "salafiyya-cairo": ("المطبعة السلفية", "المكتبة السلفية ومكتبتها"),
+}
+
+
+def publisher_family(name: str, families: dict[str, tuple[str, ...]] | None = None) -> str:
+    """The family key of a printing house known under several names, or "".
+
+    >>> publisher_family("المطبعة الكبرى الأميرية ببولاق")
+    'bulaq'
+    """
+    words = set(K(name).split())
+    for key, pats in (families or PUBLISHER_FAMILIES).items():
+        for pat in pats:
+            pw = set(K(pat).split())
+            if pw and pw <= words | {w.removeprefix("ب") for w in words}:
+                return key
+    return ""
+
+
+def same_publisher(a: str, b: str, *, families: dict[str, tuple[str, ...]] | None = None) -> bool:
     """Two forms of a publisher's name: the same distinctive words once places and generic words are set aside
     («دار الفكر» is not «دار الفكر المعاصر»).
 
     >>> same_publisher("دار الكتب العلمية - بيروت", "دار الكتب العلمية")
     True
     """
+    fa, fb = publisher_family(a, families), publisher_family(b, families)
+    if fa or fb:
+        return fa == fb
     ta, tb = _toks(a), _toks(b)
     if not ta or not tb:
         return K(a) == K(b) and bool(K(a))

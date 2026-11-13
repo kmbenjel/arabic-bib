@@ -1,0 +1,56 @@
+# text	profile	expected
+الإمام	search	الامام
+أحمد	search	احمد
+إسلام	search	اسلام
+آمن	search	امن
+ٱلرحمن	search	الرحمن
+القرآن	search	القران
+مكتبة	search	مكتبه
+مكتبه	search	مكتبه
+مصطفى	search	مصطفي
+موسى	search	موسي
+مسؤول	search	مسوول
+رئيس	search	رييس
+سماء	search	سما
+شيء	search	شي
+الإِمَامُ	search	الامام
+مُحَمَّدٌ	search	محمد
+عَلَيْهِ السَّلَامُ	search	عليه السلام
+الرَّحْمٰنِ	search	الرحمن
+كتــــاب	search	كتاب
+ﺟﻬﺎﺩ	search	جهاد
+ﻻ إله إلا الله	search	لا اله الا الله
+ﷲ	search	الله
+یوسف	search	يوسف
+کتاب	search	كتاب
+١٤٢٠ هـ	search	1420 ه
+۱۴۲۰	search	1420
+تحقيق: أحمد شاكر	search	تحقيق احمد شاكر
+«الرسالة» (ط. الحلبي)	search	الرساله ط الحلبي
+ابن تيمية، أحمد	search	ابن تيميه احمد
+Les Misérables	search	les misérables
+IBN TAYMIYYA	search	ibn taymiyya
+  الكتاب   الأول  	search	الكتاب الاول
+الامام	search	الامام
+‏الرسالة‎	search	الرساله
+مكتبــة  المعارف ،الرباط	display	مكتبة المعارف، الرباط
+الطبعة الأولى ، 1420 هـ	display	الطبعة الأولى، 1420 هـ
+ما هذا ؟	display	ما هذا؟
+( الرسالة )	display	(الرسالة)
+« الأم »	display	«الأم»
+قال :	display	قال:
+ﺟﻬﺎﺩ النفس	display	جهاد النفس
+یوسف	display	يوسف
+الإمام	display	الإمام
+القرآن	display	القرآن
+الكتاب   الأول	display	الكتاب الأول
+تحقيق:أحمد شاكر	display	تحقيق:أحمد شاكر
+أ،ب	display	أ، ب
+المكتبة	loose	مكتبه
+والكتاب	loose	كتاب
+الكتاب الأول	loose	كتاب اول
+بالكتاب	loose	بالكتاب
+للكتاب	loose	كتاب
+الله	loose	الله
+1420هـ	display	1420هـ
+سنة 728 هـ	display	سنة 728 هـ

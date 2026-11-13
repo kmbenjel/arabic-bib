@@ -276,6 +276,11 @@ def cmd_safe(a: argparse.Namespace) -> int:
 
 
 def cmd_profiles(a: argparse.Namespace) -> int:
+    if a.planfs:
+        from .audit import planfs_profile
+
+        print(json.dumps(planfs_profile(a.planfs), ensure_ascii=False, indent=2))
+        return 0
     print(_C.bold("naming profiles (compose, audit):"))
     for p in NAME_PROFILES.values():
         print(f"  {p.name:<13} {p.max_bytes} bytes  {p.description}")
@@ -423,7 +428,8 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("text", nargs="*")
     p.add_argument("--max-bytes", type=int, default=255)
 
-    add("profiles", cmd_profiles, "list naming and normalisation profiles and the audit checks")
+    p = add("profiles", cmd_profiles, "list naming and normalisation profiles and the audit checks")
+    p.add_argument("--planfs", metavar="PROFILE", help="print a naming profile as planfs profile JSON")
     return ap
 
 

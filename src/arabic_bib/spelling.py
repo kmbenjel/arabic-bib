@@ -16,7 +16,7 @@ from .normalize import NormProfile, normalize_mapped
 
 __all__ = ["WaslError", "fix_wasl", "has_presentation_forms", "safe_filename", "wasl_errors"]
 
-_C = r"[بتثجحخدذرزسشصضطظعغفقكلمنهوي]"  # one consonant
+_C = r"[بتثجحخدذرزسشصضطظعغفقكلمنهويءئؤأ]"  # one consonant (a hamza counts)
 _PREFIX = r"(?:وال|فال|بال|كال|لل|ال|و|ف|ب|ك|ل)?"
 # VII إن C C ا, VIII إ C ت C ا, X إست C C ا; VIII after ص ض (اصط… اضط…) and ز (ازد…); VIII of a root whose first
 # radical is و or أ, or ت, د (the ت assimilated: اتّصال، اتّخاذ، ادّعاء, the shadda often left out)

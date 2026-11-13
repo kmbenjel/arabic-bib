@@ -19,7 +19,7 @@ from pathlib import Path
 from .compose import NameProfile, get_profile
 from .spelling import FORBIDDEN, fix_wasl, has_presentation_forms, safe_filename, wasl_errors
 
-__all__ = ["CHECKS", "Issue", "audit_name", "audit_tree", "fix_name"]
+__all__ = ["CHECKS", "Issue", "audit_name", "audit_tree", "fix_name", "planfs_profile"]
 
 
 @dataclass(frozen=True)
@@ -37,7 +37,7 @@ CHECKS: dict[str, tuple[str, str]] = {
     "forbidden-char": ("error", 'a character some file systems refuse: \\ / : * ? " < > | or a control character'),
     "spacing": ("error", "double space, or a space or dot at an end"),
     "invisible": ("error", "an invisible character (bidi control, zero-width joiner, BOM)"),
-    "parentheses": ("error", "parentheses (the profile writes parts with « - »)"),
+    "parentheses": ("error", "parentheses or square brackets (the profile writes parts with « - »)"),
     "comma": ("error", "a comma (the profile writes none)"),
     "equals": ("error", "«=» between titles (the profile writes «أو»)"),
     "ta-prefix": ("error", "«ط» before a publisher or an edition number (the profile writes the publisher alone)"),
@@ -51,12 +51,14 @@ CHECKS: dict[str, tuple[str, str]] = {
     "raw-name": ("warning", "a raw download name («12_3456.pdf», «trm01.pdf»): nothing tells what the book is"),
     "one-file-folder": ("warning", "a folder that holds one file (a single book is a plain file)"),
     "volume-twice": ("error", "two volumes with the same number"),
+    "nfc-twin": ("error", "two names in one folder that differ only in Unicode form (NFC/NFD)"),
     "numbered-99": ("warning", "indexes numbered 99 (they take the number after the last volume)"),
 }
 
 _INVISIBLE = re.compile("[​‍‎‏‪-‮⁦-⁩﻿]")
 _CONTROL = re.compile(r"[\x00-\x1f\x7f]")
-_TA = re.compile(r"(?:^|[\s(\-])ط\.?\s?(?=[0-9٠-٩]|دار|مكتبة|مؤسسة|مطبعة|المطبعة|المكتبة|الدار)")
+# «ط» as an edition mark: a token of its own («… - ط دار الفكر», «ط. 2») or glued to a number («ط2»)
+_TA = re.compile(r"(?:^|[\s(\-])ط\.?(?=\s|$|[0-9٠-٩])")
 _RAW = re.compile(r"^(\d+_[^/]*|[A-Za-z][A-Za-z_-]*?\d{1,3}[a-z]?)\.[A-Za-z0-9]{2,4}$", re.I)
 _FRONT = re.compile(r"المقدمة|الواجهة|الفهارس|ملحق|صور المخطوط|مقدمة|تقديم")
 _ARABIC = re.compile(r"[؀-ۿ]")
@@ -86,9 +88,10 @@ def fix_name(name: str, profile: str | NameProfile = "warraq", *, is_dir: bool =
         s = re.sub(r"\s*=\s*", " أو ", s)
     if not prof.ta_prefix:
         s = re.sub(r"(^|[\s(\-])ط\.?\s?(?=[0-9٠-٩])", r"\1الطبعة ", s)
-        s = re.sub(r"(^|[\s(\-])ط\.?\s(?=دار|مكتبة|مؤسسة|مطبعة|المطبعة|المكتبة|الدار)", r"\1", s)
+        s = re.sub(r"(^|[\s(\-])ط\.?\s(?=[^\s0-9٠-٩])", r"\1", s)
         s = re.sub(r"\(\s+", "(", s)
     if not prof.parentheses:
+        s = s.replace("[", "(").replace("]", ")")
         # an edition in brackets at the end becomes a part of its own: «X (ت Y - Z)» → «X - ت Y - Z»
         s = re.sub(r"\s*\(((?:ت|ط|تحقيق|ترجمة|دار|مكتبة|مؤسسة|مطبعة|المطبعة)\s[^()]*)\)\s*$", r" - \1", s)
         s = re.sub(r"\s*\(([^()]*)\)\s*", lambda m: f" {m.group(1).strip()} ", s).replace("(", " ").replace(")", " ")
@@ -128,7 +131,7 @@ def audit_name(
         add("spacing")
     if _INVISIBLE.search(name):
         add("invisible", " ".join(f"U+{ord(c):04X}" for c in sorted(set(_INVISIBLE.findall(name)))))
-    if not prof.parentheses and ("(" in name or ")" in name):
+    if not prof.parentheses and any(c in name for c in "()[]"):
         add("parentheses")
     if not prof.commas and re.search(r"[،,]", name):
         add("comma")
@@ -184,6 +187,13 @@ def audit_tree(
             r = str(rel / f) if str(rel) != "." else f
             for i in audit_name(f, prof, path=r):
                 yield i, _fix_or_empty(f, prof, False)
+        seen: dict[str, str] = {}
+        for x in sorted(dirnames) + files:
+            k = unicodedata.normalize("NFC", x)
+            if k in seen:
+                sev, msg = CHECKS["nfc-twin"]
+                yield Issue("nfc-twin", msg, str(rel / x) if str(rel) != "." else x, sev, seen[k]), ""
+            seen[k] = x
         if str(rel) == ".":
             continue
         if prof.one_file_folder and len(files) == 1 and not dirnames:
@@ -207,3 +217,26 @@ def audit_tree(
 def _fix_or_empty(name: str, prof: NameProfile, is_dir: bool) -> str:
     f = fix_name(name, prof, is_dir=is_dir)
     return f if f != name else ""
+
+
+def planfs_profile(profile: str | NameProfile = "warraq") -> dict[str, object]:
+    """The profile's file-name rules in planfs's profile JSON format (``arabic-bib profiles --planfs warraq``), so a
+    plan applied by planfs refuses names this audit would flag."""
+    prof = get_profile(profile)
+    chars = FORBIDDEN + ("()[]" if not prof.parentheses else "") + (",،" if not prof.commas else "")
+    chars += "=" if not prof.equals else ""
+    pats: list[list[str]] = []
+    if not prof.ta_prefix:
+        pats.append([r"(?:^|[\s(\-])ط\.?(?=\s|$|[0-9٠-٩])", "«ط» edition mark (write the publisher alone)"])
+    pats.append(["[\u200b\u200d\u200e\u200f\u202a-\u202e\u2066-\u2069\ufeff]", "invisible character"])
+    pats.append(["[\ufb50-\ufdff\ufe70-\ufefc]", "Arabic presentation forms"])
+    pats.append([r"  |^ | $|^\.|\.$", "double space, or a space or dot at an end"])
+    return {
+        "name": prof.name,
+        "max_name": prof.max_bytes,
+        "name_unit": "bytes",
+        "forbidden_chars": chars,
+        "forbidden_patterns": pats,
+        "protected": [],
+        "quarantine": "",
+    }

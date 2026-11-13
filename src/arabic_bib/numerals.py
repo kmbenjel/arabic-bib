@@ -26,8 +26,9 @@ _ORD: dict[str, int] = {}
 def _add_ord(word: str, n: int) -> None:
     k = _K(word)
     _ORD.setdefault(k, n)
-    if k.startswith("ال"):
-        _ORD.setdefault(k[2:], n)  # «طبعة أولى», «ط ثانية»
+    # «طبعة أولى», «ط ثانية», «حادي وعشرون»: the same without the article
+    bare = " ".join(w[2:] if w.startswith("ال") else ("و" + w[3:] if w.startswith("وال") else w) for w in k.split())
+    _ORD.setdefault(bare, n)
 
 
 for _n in range(1, 11):

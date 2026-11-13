@@ -139,7 +139,7 @@ def _profile(p: str | NormProfile) -> NormProfile:
         raise ValueError(f"unknown normalisation profile {p!r}; choose one of {', '.join(PROFILES)}") from None
 
 
-def _char(ch: str, p: NormProfile) -> str:
+def _char(ch: str, p: NormProfile, keep_tatweel: bool = False) -> str:
     """One original character → its replacement (possibly empty, possibly several characters)."""
     if p.zero_width and ch in _ZERO_WIDTH:
         return ""
@@ -151,7 +151,7 @@ def _char(ch: str, p: NormProfile) -> str:
     for c in ch:
         if p.persian_letters and c in _PERSIAN:
             c = _PERSIAN[c]
-        if p.tatweel and c == TATWEEL:
+        if p.tatweel and c == TATWEEL and not keep_tatweel:
             continue
         if p.alef or p.hamza_seats or p.diacritics:
             # a letter that carries a hamza or a madda is a base letter plus a combining mark (أ = ا + U+0654):
@@ -199,7 +199,9 @@ def normalize_mapped(text: str | None, profile: str | NormProfile = "search") ->
             j = i + 1
             while j < len(src) and unicodedata.combining(src[j]):
                 j += 1
-            cluster = unicodedata.normalize("NFC", "".join(_char(c, p) for c in src[i:j]))
+            # «هـ», the Hijri sign, keeps its tatweel in display forms
+            kt = src[i] == TATWEEL and i > 0 and src[i - 1] == "ه" and (j >= len(src) or not src[j].isalpha())
+            cluster = unicodedata.normalize("NFC", "".join(_char(c, p, kt) for c in src[i:j]))
             for c in cluster:
                 chars.append(c)
                 offs.append(i)

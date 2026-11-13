@@ -7,7 +7,7 @@ The default `warraq` profile writes::
 with no parentheses, no commas, no «ط», no «=», within 240 bytes with the extension. **Nothing is shortened when the
 whole name fits.** When it does not, parts give way in the profile's order — for `warraq`: the year, the city, a
 subtitle, the publisher, editors after the second, other contributors, authors after the second, a long printed role,
-people's names (to a shorter form of the same name), the words after each title's head, the second author, the
+the second editor, people's names (to a shorter form of the same name), the words after each title's head, the second author, the
 joined titles («ويليه»), the first editor — and the most important part dropped is put back whenever room allows.
 A title is cut only at a natural break («جمع الجوامع في أصول الفقه» → «جمع الجوامع»), never inside a word or a
 pair («القضاء والفتيا»).
@@ -39,7 +39,7 @@ def B(s: str) -> int:
 # ------------------------------------------------------------------------------------------------------ profile
 GIVE_WAY_WARRAQ = (
     "year", "city", "subtitle", "publisher", "editors_after_2", "contributors", "authors_after_2", "role",
-    "person_names", "title_tails", "second_author", "joined_titles", "first_editor", "title_words", "author",
+    "second_editor", "person_names", "title_tails", "second_author", "joined_titles", "first_editor", "title_words", "author",
 )
 
 
@@ -59,6 +59,7 @@ class NameProfile:
     equals: bool = True  # «=» between alternative titles; False → «أو»
     ta_prefix: bool = True  # «ط <publisher>»; False → the publisher alone
     default_role: str = "ت"
+    repeat_author: bool = True  # False: no author when the title already holds the name («كتاب سيبويه»)
     give_way: tuple[str, ...] = GIVE_WAY_WARRAQ
     # audit switches
     forbidden_words: tuple[str, ...] = ()
@@ -84,6 +85,7 @@ PROFILES: dict[str, NameProfile] = {
         ta_prefix=False,
         forbidden_words=("تحميل", "اونلاين", "أونلاين", "pdf ", "_alt", "نسخة ثانية"),
         one_file_folder=True,
+        repeat_author=False,
         numbered_99=True,
         allowed_extensions=(".pdf",),
         description="The Warraq library rules: title - author - ت editor - publisher city; no () , ط =; 240 bytes.",
@@ -371,6 +373,8 @@ def _prepare(book: Book, prof: NameProfile) -> _Parts:
             if x:
                 kinds.append(x)
         author = tidy(re.sub(r"\([^()]*\)", " ", author))
+    if not prof.repeat_author and author and f" {N(author)} " in f" {N(title)} ":
+        author = ""  # «تفسير ابن أبي حاتم الرازي», «كتاب سيبويه»: the title names him
     parts = JOIN.split(title)
     segs, joins = parts[0::2], parts[1::2]
     opts = [title_options(s)[:10] for s in segs]
@@ -464,6 +468,10 @@ def _steps(p: _Parts, st: _State, step: str) -> bool:
     elif step == "editors_after_2":
         if st.n_editors > 2:
             st.n_editors -= 1
+            return True
+    elif step == "second_editor":
+        if st.n_editors == 2:
+            st.n_editors = 1
             return True
     elif step == "contributors":
         if st.n_contrib > 0:
@@ -566,7 +574,7 @@ def _State_full(p: _Parts) -> _State:  # noqa: N802
 _STEP_FIELDS = {
     "year": ("year",), "city": ("city",), "subtitle": ("subtitle",), "publisher": ("publisher", "year"),
     "editors_after_2": ("n_editors",), "contributors": ("n_contrib",), "authors_after_2": ("n_people",),
-    "role": ("role_level",), "person_names": ("editor_form", "people_form"), "title_tails": ("seg_level",),
+    "role": ("role_level",), "second_editor": ("n_editors",), "person_names": ("editor_form", "people_form"), "title_tails": ("seg_level",),
     "second_author": ("n_people",), "joined_titles": ("n_joined",), "first_editor": ("n_editors", "n_contrib"),
     "title_words": ("title_words",), "author": ("author",),
 }
@@ -629,12 +637,13 @@ def volumes(
 
 # ------------------------------------------------------------------------------------------- reading a name back
 _ROLE_HEAD = re.compile(
-    r"^(?:ت|ترجمة|تحقيق|حققه|صححه|ضبطه|اعتنى|عني|شرح|تقديم|قدم|إشراف|جمع|إعداد|تخريج|مراجعة|راجعه|علق|تعليق|"
+    r"^(?:ت|ترجمة|تحقيق|حققه|صححه|ضبطه|ضبط|ترقيم|اعتنى|عني|شرح|تقديم|قدم|إشراف|جمع|إعداد|تخريج|مراجعة|راجعه|علق|تعليق|"
     r"قرأه|تنسيق|نسخه)(?:\s|$)"
 )
 _PUB_HEAD = re.compile(
     r"^(?:ط\s+)?(?:دار|مكتبة|المكتبة|مكتبه|مؤسسة|مطبعة|المطبعة|مطابع|المكتب|وزارة|مجمع|المجمع|جامعة|مركز|الهيئة|"
-    r"المجلس|عالم|إدارة|الأمانة|بيت|شركة|منشورات|معهد|الجمعية|جمعية|الدار|دائرة|مجلس|طبعة حجرية)(?:\s|$)"
+    r"المجلس|عالم|إدارة|الأمانة|بيت|شركة|منشورات|معهد|الجمعية|جمعية|الدار|دائرة|مجلس|أكاديمية|اتحاد|رابطة|"
+    r"النادي|نادي|المؤسسة|الشركة|مجموعة|مطبوعات|طبعة حجرية)(?:\s|$)"
 )
 _KIND_SEG = re.compile(r"^(?:مخطوط|مخطوطة|رسالة(?: علمية| جامعية| ماجستير| دكتوراه)?|أطروحة.*|بحث محكم|نسخة خطية|"
                        r"طبعة حجرية|مستل.*)$")
@@ -663,8 +672,10 @@ def parse_name(name: str, *, is_folder: bool = False) -> dict[str, object]:
         if _ROLE_HEAD.match(seg) and "editor" not in out:
             role, _, names = seg.partition(" ")
             if role != "ت":
-                mm = re.match(r"^(.*?(?:عليه|له|لها|به|بها|وشرحه|وحققه|بتصحيحه))\s+(.+)$", seg)
-                role, names = (mm.group(1), mm.group(2)) if mm else (role, names)
+                from .edition import _ROLE_RE
+
+                mm = _ROLE_RE.match(seg)
+                role, names = (mm["role"], mm["names"]) if mm else (role, names)
             out["role"] = role
             out["editor"] = names
             out["editors"] = [x.strip() for x in PERSONS.split(names) if x.strip()]
