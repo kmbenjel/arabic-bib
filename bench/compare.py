@@ -113,7 +113,9 @@ def adapter(lib: str):  # type: ignore[no-untyped-def]
             s = a.normalize_teh(s)
             return " ".join(s.split())
 
-        return version("pyarabic"), norm, {}, None
+        import pyarabic.number as pn
+
+        return version("pyarabic"), norm, {"number": pn.text2number}, None
 
     if lib == "camel":
         from camel_tools.utils.dediac import dediac_ar

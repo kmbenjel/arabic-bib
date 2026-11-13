@@ -73,7 +73,9 @@ TRAILING = re.compile(
 KUNYA_HEADS = _set("أبو أبي أبا أم ابو ابي ابا")
 LINKS = _set("بن ابن بنت ولد")
 IBN, BINT = K("ابن"), K("بنت")
-LAQAB_TAILS = _set("الدين الدولة الإسلام الملك")
+LAQAB_TAILS = _set("الدين الدولة الإسلام الملك السنة الأئمة الشريعة القضاة")
+# titles written after a modern name («إسماعيل باشا», «محمد بك»): honorifics wherever they stand
+POST_TITLES = _set("باشا بك بيك أفندي افندي آغا اغا خان")
 # given names that begin with the article (an «ال» word is otherwise a nisba or an epithet)
 AL_ISMS = _set(
     "الحسن الحسين القاسم العباس الفضل الربيع الليث المغيرة النعمان الوليد المنذر الحارث المهدي المعتمد المأمون "
@@ -201,7 +203,7 @@ class AuthorName:
 
 
 # ----------------------------------------------------------------------------------------------------- parsing
-_SHUHRA_RE = re.compile(r"\s*[،,]?\s*(?:المعروف|المشهور|الشهير|المعروفة|المشهورة|الشهيرة)\s+ب\s*(?=\S)")
+_SHUHRA_RE = re.compile(r"\s*[،,]?\s*(?:المعروف|المشهور|الشهير|المعروفة|المشهورة|الشهيرة)\s+بـ?\s*(?=\S)")
 _ALT_SEP = re.compile(r"\s*[؛;]\s*")
 _PAREN = re.compile(r"\(([^()]*)\)|\[([^\[\]]*)\]")
 
@@ -243,6 +245,10 @@ def _split_units(words: list[str]) -> list[Unit]:
         two = K(" ".join(words[i : i + 2])) if i + 1 < n else ""
         three = K(" ".join(words[i : i + 3])) if i + 2 < n else ""
         lead = not any(u.kind in ("name", "nasab", "kunya", "nisba", "ibn") for u in out)  # titles come first
+        if k in POST_TITLES and out:
+            out.append(Unit("honor", words[i]))
+            i += 1
+            continue
         if raw_aal(words[i]) and i + 1 < n:
             out.append(Unit("family", " ".join(words[i : i + 2])))  # «آل الشيخ»
             i += 2
@@ -330,16 +336,31 @@ def _split_units(words: list[str]) -> list[Unit]:
     return res
 
 
+_FUSED = (
+    (re.compile(r"(?<![\w])(أبو|أبي|أبا|ابو|ابي|ابا)(?=ال\w{2,}|[^\s\d]{3,})"), r"\1 "),  # «أبوالحسن», «أبيالكرم»
+    (re.compile(r"(?<![\w])(عبد|عبيد)(?=ال\w{2,})"), r"\1 "),  # «عبدالكريم» (never «عبده»)
+    (re.compile(r"(?<![\w])(\w{2,})(?=(?:الدين|الدولة|الإسلام|الاسلام)(?![\w]))"), r"\1 "),  # «عزالدين»
+)
+
+
+def _unfuse(s: str) -> str:
+    """Particles written without their space in some catalogues: «أبوالحسن», «عبدالكريم», «عزالدين»."""
+    for rx, rp in _FUSED:
+        s = rx.sub(rp, s)
+    return s
+
+
 def _clean(raw: str) -> tuple[str, str, Death | None]:
     """→ (the name without dates and brackets, an explicit shuhra, the dates)."""
-    s = raw or ""
+    s = _unfuse(raw or "")
     d = parse_death(s)
     s = strip_dates(s)
     s = TRAILING.sub("", s)
     shuhra = ""
     m = _SHUHRA_RE.search(s)
     if m:
-        shuhra = s[m.end() :].strip(" ،,.")
+        shuhra = s[m.end() :].strip(" ،,.ـ")
+        shuhra = re.sub(r"^(?:ال)?(?:شيخ|إمام|امام|حافظ|قاضي|علامة)\s+", "", shuhra)  # «بالشيخ الخضري»
         s = s[: m.start()].strip(" ،,")
 
     def paren(mt: re.Match[str]) -> str:
@@ -361,7 +382,10 @@ def _clean(raw: str) -> tuple[str, str, Death | None]:
         # «"إبن المقفع، عبد الله"», «كاترمير، ا. م.»: the head is the name he is known by; the name is written back
         # in its natural order, the head after the given names
         head, tail = (x.strip() for x in re.split(r"\s*[،,]\s*", s, maxsplit=1))
-        if 1 <= len(head.split()) <= 3 and tail and len(tail.split()) <= 5 and not re.search(r"[0-9٠-٩]", tail):
+        hk = K(head).split()
+        laqab_head = len(hk) == 2 and hk[1] in LAQAB_TAILS
+        if (1 <= len(head.split()) <= 3 and tail and len(tail.split()) <= 5 and not re.search(r"[0-9٠-٩]", tail)
+                and not laqab_head):
             shuhra = shuhra or head
             s = f"{tail} {head}"
         else:
@@ -553,7 +577,8 @@ def match_authors(a: str | AuthorName, b: str | AuthorName, *, common: Iterable[
     if S.nasab:
         checked += 1
         if L.nasab:
-            ok = _nasab_fits(S.nasab, L.nasab, cg)
+            ok = _nasab_fits(S.nasab, L.nasab, cg) or (
+                len(S.nasab) >= 2 and _ibn_supported(K(S.nasab[-1]), L) and _nasab_fits(S.nasab[:-1], L.nasab, cg))
             if ok:
                 support += 1
                 reasons.append(f"nasab:{' '.join(S.nasab)}")
@@ -574,9 +599,9 @@ def match_authors(a: str | AuthorName, b: str | AuthorName, *, common: Iterable[
             reasons.append(f"shuhra:{u.text}")
             if x not in cg:
                 distinctive += 1
-        elif x not in cg and (len(L.nasab) >= 2 or any(v.kind == "ibn" for v in L.a.units) or
-                              K(L.shuhra).startswith("ابن ")):
-            conflicts.append(f"ibn-conflict:{u.text}")  # a full nasab, or another «ابن …», without his
+        elif x not in cg and (any(v.kind == "ibn" for v in L.a.units) or K(L.shuhra).startswith("ابن ")):
+            # another «ابن …» (a long nasab may stop before the forefather he is named after: Ibn al-Athir)
+            conflicts.append(f"ibn-conflict:{u.text}")
     # kunya
     if S.kunya:
         checked += 1
@@ -603,9 +628,10 @@ def match_authors(a: str | AuthorName, b: str | AuthorName, *, common: Iterable[
     # epithets and nisbas: «الجاحظ», «السيوطي», «الحراني»
     l_al = L.nisba | L.epithets
     s_rare = [x for x in S.nisba | S.epithets if x not in cn and x not in _EPITHET_COMMON]
+    l_var = l_al | {y[:-1] for y in l_al if y.endswith("ي") and len(y) > 5} | {y + "ي" for y in l_al}
     for x in S.nisba | S.epithets:
         checked += 1
-        if x in l_al or _strip_al(x) in L.ibn:
+        if x in l_var or _strip_al(x) in L.ibn:
             support += 1
             reasons.append(f"nisba:{x}")
             if x not in cn and x not in _EPITHET_COMMON:
@@ -613,7 +639,7 @@ def match_authors(a: str | AuthorName, b: str | AuthorName, *, common: Iterable[
     l_rare = [x for x in l_al if x not in cn and x not in _EPITHET_COMMON]
     if s_rare and l_rare and not (set(s_rare) & set(l_rare)) and not any(_strip_al(x) in L.ibn for x in s_rare):
         # two distinctive nisbas or epithets and not one in common: «العسقلاني» / «الهيتمي», «الجد» / «الحفيد»
-        if not (set(s_rare) & l_al) and not (set(l_rare) & (S.nisba | S.epithets)):
+        if not (set(s_rare) & l_var) and not (set(l_rare) & (S.nisba | S.epithets)):
             conflicts.append(f"nisba-conflict:{'/'.join(s_rare)}!={'/'.join(l_rare)}")
     # the nasab triple: ism + father + grandfather all agree — distinctive even when each name is common
     if S.ism and S.ism == L.ism and len(S.nasab) >= 2 and _nasab_fits(S.nasab, L.nasab, cg) and \

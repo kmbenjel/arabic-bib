@@ -7,7 +7,7 @@ Made by `bench/compare.sh` on a Linux VM (Python 3.12). Every number below comes
 | library | version | installed size | packages pulled in | import time |
 |---|---|---|---|---|
 | arabic-bib | 0.1.0 | 1 MB | 0 | 0.091 s |
-| PyArabic | 0.6.15 | 1 MB | 2 | 0.02 s |
+| PyArabic | 0.6.15 | 1 MB | 2 | 0.019 s |
 | CAMeL Tools | 1.6.0 | 5640 MB | 82 | 0.023 s |
 | Maha | 0.3.0 | 12 MB | 8 | 0.098 s |
 | Tashaphyne | 0.3.6 | 6 MB | 3 | 0.017 s |
@@ -58,7 +58,7 @@ Labels: same / different / unknown, the decision a careful cataloguer makes from
 | death: ابن تيمية (ت 728 هـ) | `"ت 728 هـ"` | — | — | `[]` | — |
 | death: المتوفى سنة ثمان وعشرين وسبعمائة | `"ت 728 هـ"` | — | — | `[]` | — |
 | death: الذهبي (673 - 748 هـ) | `"ت 748 هـ"` | — | — | `[]` | — |
-| number: ثمان وعشرين وسبعمائة | `728` | — | — | `["728"]` | — |
+| number: ثمان وعشرين وسبعمائة | `728` | `728` | — | `["728"]` | — |
 | ordinal: الحادية عشرة | `11` | — | — | `["11"]` | — |
 | edition: الطبعة الأولى، دار الكتب العلمية، بيروت، 1420 هـ - 1999 م | `{"number": 1, "publisher": "دار الكتب العلمية", "city": "بيروت", "hijri": 1420, "gregorian": 1999}` | — | — | — | — |
 | hijri: 728-11-20 | `"1328-9-26"` | — | — | — | — |
