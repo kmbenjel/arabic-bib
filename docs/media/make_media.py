@@ -1,7 +1,7 @@
 """Make the README and docs media by running the tool (run on a build machine, not a laptop):
 
     python docs/media/make_media.py            # → docs/media/audit.svg, demo.svg, examples.md
-    python docs/media/make_media.py --card     # + card.png / card.webp (needs google-chrome and Pillow)
+    python docs/media/make_media.py --card     # + card.webp (needs google-chrome and Pillow)
 
 audit.svg is a terminal recording: the real output of ``arabic-bib audit`` on a folder of badly named books, played
 back line by line (CSS animation, so it plays on GitHub). The font is Kawkab Mono (SIL OFL), embedded.

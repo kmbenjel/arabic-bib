@@ -185,20 +185,20 @@
  ],
  "fold_ok": 8,
  "match_equal": {
-  "accuracy": 0.274,
+  "accuracy": 0.265,
   "same_precision": 1.0,
-  "same_recall": 0.017,
+  "same_recall": 0.016,
   "false_merges": 0,
-  "n": 179
+  "n": 185
  },
  "match_tokens": {
-  "accuracy": 0.581,
-  "same_precision": 0.841,
-  "same_recall": 0.487,
+  "accuracy": 0.578,
+  "same_precision": 0.847,
+  "same_recall": 0.492,
   "false_merges": 1,
-  "n": 179
+  "n": 185
  },
- "baseline_seconds": 0.003,
+ "baseline_seconds": 0.0053,
  "tasks": {
   "death: ابن تيمية (ت 728 هـ)": null,
   "death: المتوفى سنة ثمان وعشرين وسبعمائة": null,
@@ -211,5 +211,5 @@
   "wasl: الإستغفار والإجتهاد": null,
   "filename: ديوان المتنبي: شرح \"العكبري\"?": null
  },
- "import_seconds": 0.023
+ "import_seconds": 0.031
 }

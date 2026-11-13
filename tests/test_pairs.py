@@ -5,7 +5,15 @@ from __future__ import annotations
 import pytest
 from tables import load
 
-from arabic_bib import AuthorMatch, author_similarity, match_authors, parse_author, same_author, same_person, same_publisher
+from arabic_bib import (
+    AuthorMatch,
+    author_similarity,
+    match_authors,
+    parse_author,
+    same_author,
+    same_person,
+    same_publisher,
+)
 from arabic_bib.authors import publisher_family
 
 PAIRS = load("author_pairs.tsv")

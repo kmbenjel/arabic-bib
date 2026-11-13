@@ -1,0 +1,28 @@
+name: Wrong result
+description: arabic-bib parsed, matched or named something wrongly
+labels: [wrong-result]
+body:
+  - type: textarea
+    id: input
+    attributes:
+      label: Input (paste the exact text)
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: got
+    attributes:
+      label: What arabic-bib returned (command and output)
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: want
+    attributes:
+      label: What it should return, and the source if it is a fact
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: arabic-bib version (`arabic-bib --version`)

@@ -17,7 +17,6 @@ What is measured, for every library with its own documented normaliser:
 from __future__ import annotations
 
 import argparse
-import csv
 import json
 import statistics
 import subprocess
@@ -61,10 +60,10 @@ TASKS = [
 
 def load_pairs() -> list[tuple[str, str, str]]:
     rows = []
-    for line in open(ROOT / "tests/cases/author_pairs.tsv", encoding="utf-8"):
+    for line in (ROOT / "tests/cases/author_pairs.tsv").read_text(encoding="utf-8").splitlines():
         if line.startswith("#") or not line.strip():
             continue
-        a, b, v = line.rstrip("\n").split("\t")[:3]
+        a, b, v = line.split("\t")[:3]
         rows.append((a, b, v))
     return rows
 
@@ -234,14 +233,14 @@ NAMES = {"ours": "arabic-bib", "pyarabic": "PyArabic", "camel": "CAMeL Tools", "
 
 
 def report(files: list[str], sizes: dict[str, dict[str, object]]) -> str:
-    rs = [json.load(open(f, encoding="utf-8")) for f in files]
+    rs = [json.loads(Path(f).read_text(encoding="utf-8")) for f in files]
     order = ["ours", "pyarabic", "camel", "maha", "tashaphyne"]
     rs.sort(key=lambda r: order.index(r["lib"]))
     L = []
     L.append("# Head-to-head results\n")
     L.append("Made by `bench/compare.sh` on a Linux VM (Python 3.12). Every number below comes from a run.\n")
     L.append("## Versions, install size, dependencies, import time\n")
-    L.append("| library | version | installed size | packages pulled in | import time |")
+    L.append("| library | version | installed size | dependencies installed | import time |")
     L.append("|---|---|---|---|---|")
     for r in rs:
         s = sizes.get(r["lib"], {})
@@ -299,7 +298,7 @@ def main() -> None:
     if a.lib:
         print(json.dumps(run_lib(a.lib), ensure_ascii=False, indent=1))
     elif a.report:
-        sizes = json.load(open(a.sizes, encoding="utf-8")) if a.sizes else {}
+        sizes = json.loads(Path(a.sizes).read_text(encoding="utf-8")) if a.sizes else {}
         sys.stdout.write(report(a.report, sizes))
 
 

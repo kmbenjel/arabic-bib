@@ -1,0 +1,14 @@
+name: Feature request
+description: A form, a profile or a field arabic-bib should understand
+labels: [enhancement]
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: What do you need, with two or three real examples?
+    validations:
+      required: true
+  - type: textarea
+    id: now
+    attributes:
+      label: What do you do today without it?

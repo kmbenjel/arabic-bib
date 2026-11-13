@@ -4,13 +4,13 @@ Made by `bench/compare.sh` on a Linux VM (Python 3.12). Every number below comes
 
 ## Versions, install size, dependencies, import time
 
-| library | version | installed size | packages pulled in | import time |
+| library | version | installed size | dependencies installed | import time |
 |---|---|---|---|---|
-| arabic-bib | 0.1.0 | 1 MB | 0 | 0.091 s |
-| PyArabic | 0.6.15 | 1 MB | 2 | 0.019 s |
-| CAMeL Tools | 1.6.0 | 5640 MB | 82 | 0.023 s |
-| Maha | 0.3.0 | 12 MB | 8 | 0.098 s |
-| Tashaphyne | 0.3.6 | 6 MB | 3 | 0.017 s |
+| arabic-bib | 0.1.0 | 1 MB | 0 | 0.134 s |
+| PyArabic | 0.6.15 | 1 MB | 1 | 0.03 s |
+| CAMeL Tools | 1.6.0 | 5639 MB | 81 | 0.031 s |
+| Maha | 0.3.0 | 11 MB | 7 | 0.131 s |
+| Tashaphyne | 0.3.6 | 6 MB | 2 | 0.027 s |
 
 ## 1. Spelling variants folded to one search key
 
@@ -33,23 +33,23 @@ Made by `bench/compare.sh` on a Linux VM (Python 3.12). Every number below comes
 | bidi marks: «‏الرسالة‎» = «الرسالة» | ✓ | ✗ | ✗ | ✗ | ✗ |
 | **total** | **15/15** | **7/15** | **8/15** | **11/15** | **7/15** |
 
-## 2. Author-name matching (179 labelled pairs, `tests/cases/author_pairs.tsv`)
+## 2. Author-name matching (185 labelled pairs, `tests/cases/author_pairs.tsv`)
 
 Labels: same / different / unknown, the decision a careful cataloguer makes from the two strings alone. A false merge is «same» said of two different people.
 
 | method | accuracy | precision of «same» | recall of «same» | false merges |
 |---|---|---|---|---|
 | **arabic-bib `match_authors`** | **96%** | **99%** | **97%** | **1** |
-| arabic-bib + equal after normalising | 27% | 100% | 2% | 0 |
-| arabic-bib + words of one ⊂ the other | 59% | 84% | 50% | 1 |
-| PyArabic + equal after normalising | 27% | 100% | 2% | 0 |
-| PyArabic + words of one ⊂ the other | 58% | 84% | 49% | 1 |
-| CAMeL Tools + equal after normalising | 27% | 100% | 2% | 0 |
-| CAMeL Tools + words of one ⊂ the other | 58% | 84% | 49% | 1 |
-| Maha + equal after normalising | 27% | 100% | 2% | 0 |
-| Maha + words of one ⊂ the other | 58% | 84% | 49% | 1 |
-| Tashaphyne + equal after normalising | 27% | 100% | 2% | 0 |
-| Tashaphyne + words of one ⊂ the other | 58% | 84% | 49% | 1 |
+| arabic-bib + equal after normalising | 26% | 100% | 2% | 0 |
+| arabic-bib + words of one ⊂ the other | 60% | 85% | 52% | 1 |
+| PyArabic + equal after normalising | 26% | 100% | 2% | 0 |
+| PyArabic + words of one ⊂ the other | 58% | 85% | 49% | 1 |
+| CAMeL Tools + equal after normalising | 26% | 100% | 2% | 0 |
+| CAMeL Tools + words of one ⊂ the other | 58% | 85% | 49% | 1 |
+| Maha + equal after normalising | 26% | 100% | 2% | 0 |
+| Maha + words of one ⊂ the other | 58% | 85% | 49% | 1 |
+| Tashaphyne + equal after normalising | 26% | 100% | 2% | 0 |
+| Tashaphyne + words of one ⊂ the other | 58% | 85% | 49% | 1 |
 
 ## 3. Bibliographic tasks (closest public function of each library)
 

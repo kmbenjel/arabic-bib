@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use arabic-bib, please cite it as below."
+title: "arabic-bib: Arabic bibliographic text (normalisation, author names, death years, Hijri dates, editions, file names)"
+abstract: >-
+  A dependency-free Python library and command line for Arabic bibliographic text: search and display
+  normalisation that keeps the original, classical author-name parsing (ism, nasab, kunya, laqab, nisba, shuhra)
+  and matching, death-year and century parsing, tabular Hijri-Gregorian conversion, edition statements,
+  book-name composition under configurable profiles, and file-name audit.
+type: software
+authors:
+  - family-names: Benjelloun
+    given-names: Khalid
+version: 0.1.0
+date-released: 2026-11-13
+license: MIT
+repository-code: "https://github.com/kmbenjel/arabic-bib"
+url: "https://warraq.benjelloun.dev/arabic-bib/"
+keywords:
+  - Arabic
+  - bibliography
+  - library catalogues
+  - author names
+  - Hijri calendar
+  - text normalisation

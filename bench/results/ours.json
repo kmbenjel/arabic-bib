@@ -185,28 +185,28 @@
  ],
  "fold_ok": 15,
  "match_equal": {
-  "accuracy": 0.274,
+  "accuracy": 0.265,
   "same_precision": 1.0,
-  "same_recall": 0.017,
+  "same_recall": 0.016,
   "false_merges": 0,
-  "n": 179
+  "n": 185
  },
  "match_tokens": {
-  "accuracy": 0.592,
-  "same_precision": 0.845,
-  "same_recall": 0.504,
+  "accuracy": 0.595,
+  "same_precision": 0.853,
+  "same_recall": 0.516,
   "false_merges": 1,
-  "n": 179
+  "n": 185
  },
- "baseline_seconds": 0.0276,
+ "baseline_seconds": 0.0438,
  "match_ours": {
-  "accuracy": 0.961,
-  "same_precision": 0.991,
-  "same_recall": 0.966,
+  "accuracy": 0.962,
+  "same_precision": 0.992,
+  "same_recall": 0.968,
   "false_merges": 1,
-  "n": 179
+  "n": 185
  },
- "match_seconds": 0.1179,
+ "match_seconds": 0.2055,
  "misses": [
   [
    "الشافعي",
@@ -283,5 +283,5 @@
   "wasl: الإستغفار والإجتهاد": "الاستغفار والاجتهاد",
   "filename: ديوان المتنبي: شرح \"العكبري\"?": "ديوان المتنبي شرح «العكبري»؟"
  },
- "import_seconds": 0.091
+ "import_seconds": 0.134
 }

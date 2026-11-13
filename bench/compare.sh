@@ -9,11 +9,11 @@ declare -A PKG=([ours]="." [pyarabic]="pyarabic" [camel]="camel-tools" [maha]="m
 echo "{" > bench/results/sizes.json
 first=1
 for lib in ours pyarabic camel maha tashaphyne; do
-  [ -x "$V/$lib/bin/python" ] || uv venv -q -p 3.12 "$V/$lib"
+  uv venv -q --clear -p 3.12 "$V/$lib"   # fresh, so sizes count only this library
   uv pip install -q -p "$V/$lib/bin/python" "${PKG[$lib]}"
   site=$("$V/$lib/bin/python" -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])')
   mb=$(du -sm "$site" | cut -f1)
-  pkgs=$(uv pip list -p "$V/$lib/bin/python" 2>/dev/null | tail -n +3 | grep -vc '^arabic-bib ' || true)
+  pkgs=$(($(uv pip list -p "$V/$lib/bin/python" 2>/dev/null | tail -n +3 | wc -l) - 1))   # dependencies, the library itself not counted
   [ $first = 1 ] || echo "," >> bench/results/sizes.json; first=0
   printf '"%s": {"mb": %s, "pkgs": %s}' "$lib" "$mb" "$pkgs" >> bench/results/sizes.json
   "$V/$lib/bin/python" -W ignore bench/compare.py --lib "$lib" > "bench/results/$lib.json"
