@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import contextlib
 import csv
 import json
 import os
@@ -433,7 +434,17 @@ def build_parser() -> argparse.ArgumentParser:
     return ap
 
 
+def _utf8_output() -> None:
+    """Arabic output must not fail on a console with a legacy code page (Windows cp1252)."""
+    for stream in (sys.stdout, sys.stderr):
+        enc = (getattr(stream, "encoding", None) or "").lower().replace("-", "")
+        if enc != "utf8" and hasattr(stream, "reconfigure"):
+            with contextlib.suppress(OSError, ValueError):
+                stream.reconfigure(encoding="utf-8", errors="replace")
+
+
 def main(argv: Sequence[str] | None = None) -> int:
+    _utf8_output()
     ap = build_parser()
     args = ap.parse_args(argv)
     if not getattr(args, "fn", None):
