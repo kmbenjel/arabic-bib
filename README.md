@@ -44,7 +44,7 @@ run or from the library's own documentation. Script: [`bench/compare.sh`](bench/
 
 | | **arabic-bib 0.1** | PyArabic 0.6.15 | CAMeL Tools 1.6.0 | Maha 0.3.0 | Tashaphyne 0.3.6 |
 |---|---|---|---|---|---|
-| Search folding of 15 spelling variants (hamza seats, ta marbuta, PDF presentation forms, Persian letters, digits, bidi marks) | **15/15** | 7/15 | 8/15 | 11/15 | 7/15 |
+| Search folding of 15 spelling variants (hamza seats, ta marbuta, PDF presentation forms, Persian letters, digits, bidi marks) | **15/15** | 9/15 | 8/15 | 11/15 | 7/15 |
 | Folded text mapped back to the original (highlight a hit in the printed string) | ✓ | ✗ | ✗ | ✗ | ✗ |
 | Display normalisation (NFC, Arabic punctuation spacing, keeps «هـ») | ✓ | ✗ | partial (Unicode) | partial (spaces) | ✗ |
 | Author name parts: ism, nasab, kunya, laqab, nisba, shuhra | ✓ | ✗ | ✗ | ✗ | ✗ |

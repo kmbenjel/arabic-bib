@@ -104,10 +104,11 @@ def adapter(lib: str):  # type: ignore[no-untyped-def]
         import pyarabic.araby as a
 
         def norm(s: str) -> str:
-            # the documented helpers that fold for search; normalize_hamza is left out: its default
-            # («uniform») turns every hamza seat into «ء», which splits more spellings than it joins
+            # the documented helpers that fold for search; normalize_hamza with method="tasheel" (ؤ → و, ئ → ي),
+            # not its default («uniform»), which turns every hamza seat into «ء» and splits more than it joins
             s = a.normalize_ligature(s)
             s = a.strip_tashkeel(a.strip_tatweel(s))
+            s = a.normalize_hamza(s, method="tasheel")
             s = a.normalize_alef(s)
             s = a.normalize_teh(s)
             return " ".join(s.split())

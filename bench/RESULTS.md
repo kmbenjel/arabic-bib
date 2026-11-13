@@ -21,8 +21,8 @@ Made by `bench/compare.sh` on a Linux VM (Python 3.12). Every number below comes
 | alef wasla: «ٱلرحمن» = «الرحمن» | ✓ | ✓ | ✓ | ✓ | ✗ |
 | ta marbuta: «مكتبة» = «مكتبه» | ✓ | ✓ | ✓ | ✓ | ✓ |
 | alef maqsura: «مصطفى» = «مصطفي» | ✓ | ✗ | ✓ | ✓ | ✓ |
-| hamza on waw: «مسؤول» = «مسوول» | ✓ | ✗ | ✗ | ✓ | ✗ |
-| hamza on ya: «رئيس» = «رييس» | ✓ | ✗ | ✗ | ✓ | ✗ |
+| hamza on waw: «مسؤول» = «مسوول» | ✓ | ✓ | ✗ | ✓ | ✗ |
+| hamza on ya: «رئيس» = «رييس» | ✓ | ✓ | ✗ | ✓ | ✗ |
 | diacritics: «مُحَمَّدٌ» = «محمد» | ✓ | ✓ | ✓ | ✓ | ✓ |
 | tatweel: «كتــاب» = «كتاب» | ✓ | ✓ | ✗ | ✓ | ✓ |
 | presentation forms (PDF text): «ﺟﻬﺎﺩ» = «جهاد» | ✓ | ✗ | ✓ | ✗ | ✗ |
@@ -31,7 +31,7 @@ Made by `bench/compare.sh` on a Linux VM (Python 3.12). Every number below comes
 | Persian kaf: «کتاب» = «كتاب» | ✓ | ✗ | ✗ | ✗ | ✗ |
 | Arabic-Indic digits: «١٤٢٠» = «1420» | ✓ | ✗ | ✗ | ✓ | ✗ |
 | bidi marks: «‏الرسالة‎» = «الرسالة» | ✓ | ✗ | ✗ | ✗ | ✗ |
-| **total** | **15/15** | **7/15** | **8/15** | **11/15** | **7/15** |
+| **total** | **15/15** | **9/15** | **8/15** | **11/15** | **7/15** |
 
 ## 2. Author-name matching (185 labelled pairs, `tests/cases/author_pairs.tsv`)
 

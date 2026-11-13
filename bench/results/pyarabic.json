@@ -69,10 +69,10 @@
    ],
    "what": "hamza on waw",
    "out": [
-    "مسؤول",
+    "مسوول",
     "مسوول"
    ],
-   "ok": false
+   "ok": true
   },
   {
    "pair": [
@@ -81,10 +81,10 @@
    ],
    "what": "hamza on ya",
    "out": [
-    "رئيس",
+    "رييس",
     "رييس"
    ],
-   "ok": false
+   "ok": true
   },
   {
    "pair": [
@@ -183,7 +183,7 @@
    "ok": false
   }
  ],
- "fold_ok": 7,
+ "fold_ok": 9,
  "match_equal": {
   "accuracy": 0.265,
   "same_precision": 1.0,
