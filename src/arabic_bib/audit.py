@@ -233,10 +233,9 @@ def planfs_profile(profile: str | NameProfile = "warraq") -> dict[str, object]:
     pats.append([r"  |^ | $|^\.|\.$", "double space, or a space or dot at an end"])
     return {
         "name": prof.name,
+        "description": f"arabic-bib naming profile «{prof.name}»: {prof.description}".strip(" :"),
         "max_name": prof.max_bytes,
         "name_unit": "bytes",
         "forbidden_chars": chars,
         "forbidden_patterns": pats,
-        "protected": [],
-        "quarantine": "",
     }
