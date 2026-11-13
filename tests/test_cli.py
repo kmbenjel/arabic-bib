@@ -106,3 +106,13 @@ def test_text_tools(capsys: pytest.CaptureFixture[str], monkeypatch: pytest.Monk
 
     monkeypatch.setattr(sys, "stdin", io.StringIO("الإمام\nالقرآن\n"))
     assert run(capsys, "normalize")[1].splitlines() == ["الامام", "القران"]
+
+
+def test_missing_extra_is_one_line(capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch) -> None:
+    def no_hijridate() -> None:
+        raise ImportError("calendar='umalqura' needs the optional package hijridate: pip install 'arabic-bib[umalqura]'")
+
+    monkeypatch.setattr("arabic_bib.dates._umalqura", no_hijridate)
+    assert main(["hijri", "1400-01-01", "--calendar", "umalqura"]) == 2
+    assert "pip install 'arabic-bib[umalqura]'" in capsys.readouterr().err
+

@@ -444,6 +444,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     except ValueError as e:
         print(f"arabic-bib {args.cmd}: {e}", file=sys.stderr)
         return 2
+    except ImportError as e:
+        if "arabic-bib[" not in str(e):  # only a missing optional extra is the user's to fix
+            raise
+        print(f"arabic-bib {args.cmd}: {e}", file=sys.stderr)
+        return 2
     except BrokenPipeError:  # pragma: no cover
         return 0
 
