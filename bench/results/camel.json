@@ -1,0 +1,215 @@
+{
+ "lib": "camel",
+ "version": "1.6.0",
+ "folds": [
+  {
+   "pair": [
+    "الإمام",
+    "الامام"
+   ],
+   "what": "hamza on alef",
+   "out": [
+    "الامام",
+    "الامام"
+   ],
+   "ok": true
+  },
+  {
+   "pair": [
+    "القرآن",
+    "القران"
+   ],
+   "what": "madda",
+   "out": [
+    "القران",
+    "القران"
+   ],
+   "ok": true
+  },
+  {
+   "pair": [
+    "ٱلرحمن",
+    "الرحمن"
+   ],
+   "what": "alef wasla",
+   "out": [
+    "الرحمن",
+    "الرحمن"
+   ],
+   "ok": true
+  },
+  {
+   "pair": [
+    "مكتبة",
+    "مكتبه"
+   ],
+   "what": "ta marbuta",
+   "out": [
+    "مكتبه",
+    "مكتبه"
+   ],
+   "ok": true
+  },
+  {
+   "pair": [
+    "مصطفى",
+    "مصطفي"
+   ],
+   "what": "alef maqsura",
+   "out": [
+    "مصطفي",
+    "مصطفي"
+   ],
+   "ok": true
+  },
+  {
+   "pair": [
+    "مسؤول",
+    "مسوول"
+   ],
+   "what": "hamza on waw",
+   "out": [
+    "مسؤول",
+    "مسوول"
+   ],
+   "ok": false
+  },
+  {
+   "pair": [
+    "رئيس",
+    "رييس"
+   ],
+   "what": "hamza on ya",
+   "out": [
+    "رئيس",
+    "رييس"
+   ],
+   "ok": false
+  },
+  {
+   "pair": [
+    "مُحَمَّدٌ",
+    "محمد"
+   ],
+   "what": "diacritics",
+   "out": [
+    "محمد",
+    "محمد"
+   ],
+   "ok": true
+  },
+  {
+   "pair": [
+    "كتــاب",
+    "كتاب"
+   ],
+   "what": "tatweel",
+   "out": [
+    "كتــاب",
+    "كتاب"
+   ],
+   "ok": false
+  },
+  {
+   "pair": [
+    "ﺟﻬﺎﺩ",
+    "جهاد"
+   ],
+   "what": "presentation forms (PDF text)",
+   "out": [
+    "جهاد",
+    "جهاد"
+   ],
+   "ok": true
+  },
+  {
+   "pair": [
+    "ﻻ",
+    "لا"
+   ],
+   "what": "lam-alef ligature",
+   "out": [
+    "لا",
+    "لا"
+   ],
+   "ok": true
+  },
+  {
+   "pair": [
+    "یوسف",
+    "يوسف"
+   ],
+   "what": "Persian ya",
+   "out": [
+    "یوسف",
+    "يوسف"
+   ],
+   "ok": false
+  },
+  {
+   "pair": [
+    "کتاب",
+    "كتاب"
+   ],
+   "what": "Persian kaf",
+   "out": [
+    "کتاب",
+    "كتاب"
+   ],
+   "ok": false
+  },
+  {
+   "pair": [
+    "١٤٢٠",
+    "1420"
+   ],
+   "what": "Arabic-Indic digits",
+   "out": [
+    "١٤٢٠",
+    "1420"
+   ],
+   "ok": false
+  },
+  {
+   "pair": [
+    "‏الرسالة‎",
+    "الرسالة"
+   ],
+   "what": "bidi marks",
+   "out": [
+    "‏الرساله‎",
+    "الرساله"
+   ],
+   "ok": false
+  }
+ ],
+ "fold_ok": 8,
+ "match_equal": {
+  "accuracy": 0.274,
+  "same_precision": 1.0,
+  "same_recall": 0.017,
+  "false_merges": 0,
+  "n": 179
+ },
+ "match_tokens": {
+  "accuracy": 0.581,
+  "same_precision": 0.841,
+  "same_recall": 0.487,
+  "false_merges": 1,
+  "n": 179
+ },
+ "baseline_seconds": 0.003,
+ "tasks": {
+  "death: ابن تيمية (ت 728 هـ)": null,
+  "death: المتوفى سنة ثمان وعشرين وسبعمائة": null,
+  "death: الذهبي (673 - 748 هـ)": null,
+  "number: ثمان وعشرين وسبعمائة": null,
+  "ordinal: الحادية عشرة": null,
+  "edition: الطبعة الأولى، دار الكتب العلمية، بيروت، 1420 هـ - 1999 م": null,
+  "hijri: 728-11-20": null,
+  "author: شيخ الإسلام تقي الدين أبو العباس أحمد بن عبد الحليم بن تيمية الحراني": null,
+  "wasl: الإستغفار والإجتهاد": null,
+  "filename: ديوان المتنبي: شرح \"العكبري\"?": null
+ },
+ "import_seconds": 0.023
+}
