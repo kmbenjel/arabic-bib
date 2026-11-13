@@ -116,7 +116,7 @@ COMMON_TOKENS: frozenset[str] = COMMON_GIVEN | COMMON_NISBA
 _EPITHET_COMMON = _set("الكبير الصغير الأكبر الأصغر الأوسط الثاني الأول الخطيب")
 _GENERATION = _set("الجد الحفيد الابن الأب")  # «ابن رشد الجد»: an epithet, never part of «ابن X»
 
-# token stop list of :func:`author_tokens` (the phone-library textnorm list)
+# token stop list of :func:`author_tokens`
 _STOP_TOKENS = _set("بن ابن ابي ابو ابا عبد الله محمد احمد علي الامام الحافظ الشيخ العلامه القاضي الدين شيخ الاسلام ت ط")
 
 
